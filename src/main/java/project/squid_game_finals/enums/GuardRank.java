@@ -1,8 +1,8 @@
-package project.squid_game_finals.entity;
+package project.squid_game_finals.enums;
 
 public enum GuardRank {
-    Worker,
-    Soldier,
-    Manager
+    worker,
+    soldier,
+    manager
 }
 

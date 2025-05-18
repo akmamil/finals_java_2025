@@ -1,31 +1,38 @@
 package project.squid_game_finals.entity;
 
 import jakarta.persistence.*;
-import java.util.List;
 import lombok.*;
+import project.squid_game_finals.enums.GameStatus;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "games")
-public class Game {
+public class Games {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
     private String description;
 
-    private String date;
+    @Column(name = "game_date", nullable = false)
+    private LocalDate gameDate;
 
-    @ManyToMany(mappedBy = "games")
-    private List<Player> players;
+    @Enumerated(EnumType.STRING)
+    private GameStatus status;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Round> rounds;
 
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PlayerGames> playerGames;
 }
+

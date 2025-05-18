@@ -1,0 +1,6 @@
+-- -- Сначала создаём игроков и раунды
+-- INSERT INTO player (id, name, status) VALUES (1, 'Player1', 'ALIVE');
+-- INSERT INTO round (id, name) VALUES (1, 'Round1');
+--
+-- -- Потом создаём результаты раунда
+-- INSERT INTO roundresult (id, player_id, round_id, result) VALUES (1, 1, 1, 'WIN');
