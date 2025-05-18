@@ -1,56 +1,65 @@
-//package project.squid_game_finals.controller;
-//
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.web.bind.annotation.*;
-//import project.squid_game_finals.entity.Player;
-//import project.squid_game_finals.service.PlayerService;
-//import project.squid_game_finals.enums.PlayerStatus;
-//
-//import java.util.List;
-//import java.util.Optional;
-//
-//@RestController
-//@RequestMapping("/players")
-//public class PlayerController {
-//
-//    @Autowired
-//    private PlayerService playerService;
-//
-//    // Получить всех игроков
-//    @GetMapping
-//    public List<Player> getAllPlayers() {
-//        return playerService.getAllPlayers();
-//    }
-//
-//    // Получить игроков по статусу
-//    @GetMapping("/status/{status}")
-//    public List<Player> getPlayersByStatus(@PathVariable PlayerStatus status) {
-//        return playerService.getPlayersByStatus(status);
-//    }
-//
-//    // Получить игрока по ID
-//    @GetMapping("/{id}")
-//    public Optional<Player> getPlayerById(@PathVariable Long id) {
-//        return playerService.getPlayerById(id);
-//    }
-//
-//    // Создать нового игрока
-//    @PostMapping
-//    public Player createPlayer(@RequestBody Player player) {
-//        return playerService.createPlayer(player);
-//    }
-//
-//    // Обновить информацию об игроке
-//    @PutMapping("/{id}")
-//    public Player updatePlayer(@PathVariable Long id, @RequestBody Player player) {
-//        player.setId(id);
-//        return playerService.updatePlayer(player);
-//    }
-//
-//    // Удалить игрока
-//    @DeleteMapping("/{id}")
-//    public void deletePlayer(@PathVariable Long id) {
-//        playerService.deletePlayer(id);
-//    }
-//}
+package project.squid_game_finals.controller;
+
+import lombok.RequiredArgsConstructor;
+
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import project.squid_game_finals.dto.PlayerDTO;
+import project.squid_game_finals.service.PlayerService;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/players")
+@RequiredArgsConstructor
+public class PlayerController {
+
+    private final PlayerService playerService;
+
+    @PostMapping
+    public ResponseEntity<?> createPlayer(@Valid @RequestBody PlayerDTO playerDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return ResponseEntity.badRequest().body(bindingResult.getAllErrors()
+                    .stream()
+                    .map(ObjectError::getDefaultMessage)
+                    .collect(Collectors.toList()));
+        }
+        PlayerDTO created = playerService.createPlayer(playerDTO);
+        return ResponseEntity.ok(created);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PlayerDTO> getPlayerById(@PathVariable Long id) {
+        PlayerDTO player = playerService.getPlayerById(id);
+        if (player != null) {
+            return ResponseEntity.ok(player);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PlayerDTO>> getAllPlayers() {
+        List<PlayerDTO> players = playerService.getAllPlayers();
+        return ResponseEntity.ok(players);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PlayerDTO> updatePlayer(@PathVariable Long id, @RequestBody PlayerDTO playerDTO) {
+        PlayerDTO updated = playerService.updatePlayer(id, playerDTO);
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePlayer(@PathVariable Long id) {
+        playerService.deletePlayer(id);
+        return ResponseEntity.noContent().build();
+    }
+}
 
